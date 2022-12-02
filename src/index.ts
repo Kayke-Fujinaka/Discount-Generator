@@ -9,10 +9,16 @@ type CustomerConditionsProps = {
   purchaseValue: number;
 };
 
+type Conditions = {
+  [key: string]: (
+    customerCondition: CustomerConditionsProps
+  ) => false | "30%" | "25%" | "20%" | "15%" | "10%" | "5%" | "Sem desconto";
+};
+
 const customerCondition: CustomerConditionsProps = {
-  isFirstPurchase: false,
-  paymentType: PaymentType.installments,
-  purchaseValue: 700,
+  isFirstPurchase: true,
+  paymentType: PaymentType.cash,
+  purchaseValue: 1500,
 };
 
 function discountGenerator({
@@ -35,10 +41,10 @@ function discountGenerator({
   const purchaseIsAboveThousand = purchaseValue > 1000;
   const purchaseIsBelowThousand = purchaseValue < 1000;
   const purchaseIsBelowFiveHundred = purchaseValue < 500;
-  const purchaseIsEqualsOrAboveFiveHundredAndIsEqualsOrBelowThousand =
+  const purchaseBetweenFiveHundredAndThousand =
     purchaseValue >= 500 && purchaseValue <= 1000;
 
-  const conditions: any = {
+  const conditions: Conditions = {
     firstPurchaseAndCashPagament: () => {
       if (!firstPurchaseAndCashPagament) return false;
       return purchaseIsAboveThousand
@@ -51,8 +57,7 @@ function discountGenerator({
       if (!firstPurchaseAndInstallmentsPagament) return false;
       return purchaseIsAboveThousand
         ? "20%"
-        : purchaseIsEqualsOrAboveFiveHundredAndIsEqualsOrBelowThousand &&
-          !purchaseIsBelowFiveHundred
+        : purchaseBetweenFiveHundredAndThousand && !purchaseIsBelowFiveHundred
         ? "15%"
         : "10%";
     },
@@ -60,8 +65,7 @@ function discountGenerator({
       if (!notFirstPurchaseAndCashPagament) return false;
       return purchaseIsAboveThousand
         ? "20%"
-        : purchaseIsEqualsOrAboveFiveHundredAndIsEqualsOrBelowThousand &&
-          !purchaseIsBelowFiveHundred
+        : purchaseBetweenFiveHundredAndThousand && !purchaseIsBelowFiveHundred
         ? "15%"
         : "10%";
     },
@@ -69,8 +73,7 @@ function discountGenerator({
       if (!notFirstPurchaseAndInstallmentsPagament) return false;
       return purchaseIsAboveThousand
         ? "10%"
-        : purchaseIsEqualsOrAboveFiveHundredAndIsEqualsOrBelowThousand &&
-          !purchaseIsBelowFiveHundred
+        : purchaseBetweenFiveHundredAndThousand && !purchaseIsBelowFiveHundred
         ? "5%"
         : "Sem desconto";
     },
@@ -80,7 +83,7 @@ function discountGenerator({
     const discount = conditions[value](customerCondition);
 
     return !discount ? acc : (acc = discount);
-  }, 0);
+  }, "");
 
   return generateDiscount;
 }
