@@ -16,9 +16,9 @@ type Conditions = {
 };
 
 const customerCondition: CustomerConditionsProps = {
-  isFirstPurchase: true,
-  paymentType: PaymentType.cash,
-  purchaseValue: 1500,
+  isFirstPurchase: false,
+  paymentType: PaymentType.installments,
+  purchaseValue: 1600,
 };
 
 function discountGenerator({
@@ -26,18 +26,6 @@ function discountGenerator({
   paymentType,
   purchaseValue,
 }: CustomerConditionsProps) {
-  const firstPurchaseAndCashPagament =
-    isFirstPurchase === true && paymentType === "cash";
-
-  const firstPurchaseAndInstallmentsPagament =
-    isFirstPurchase === true && paymentType === "installments";
-
-  const notFirstPurchaseAndCashPagament =
-    isFirstPurchase === false && paymentType === "cash";
-
-  const notFirstPurchaseAndInstallmentsPagament =
-    isFirstPurchase === false && paymentType === "installments";
-
   const purchaseIsAboveThousand = purchaseValue > 1000;
   const purchaseIsBelowThousand = purchaseValue < 1000;
   const purchaseIsBelowFiveHundred = purchaseValue < 500;
@@ -45,35 +33,36 @@ function discountGenerator({
     purchaseValue >= 500 && purchaseValue <= 1000;
 
   const conditions: Conditions = {
-    firstPurchaseAndCashPagament: () => {
-      if (!firstPurchaseAndCashPagament) return false;
-      return purchaseIsAboveThousand
-        ? "30%"
-        : purchaseIsBelowThousand && !purchaseIsBelowFiveHundred
+    firstPurchaseAndCashPayment: () => {
+      if (!(isFirstPurchase === true && paymentType === "cash")) return false;
+      if (purchaseIsAboveThousand) return "30%";
+      return purchaseIsBelowThousand && !purchaseIsBelowFiveHundred
         ? "25%"
         : "20%";
     },
-    firstPurchaseAndInstallmentsPagament: () => {
-      if (!firstPurchaseAndInstallmentsPagament) return false;
-      return purchaseIsAboveThousand
-        ? "20%"
-        : purchaseBetweenFiveHundredAndThousand && !purchaseIsBelowFiveHundred
+    firstPurchaseAndInstallmentsPayment: () => {
+      if (!(isFirstPurchase === true && paymentType === "installments"))
+        return false;
+      if (purchaseIsAboveThousand) return "20%";
+      return purchaseBetweenFiveHundredAndThousand &&
+        !purchaseIsBelowFiveHundred
         ? "15%"
         : "10%";
     },
-    notFirstPurchaseAndCashPagament: () => {
-      if (!notFirstPurchaseAndCashPagament) return false;
-      return purchaseIsAboveThousand
-        ? "20%"
-        : purchaseBetweenFiveHundredAndThousand && !purchaseIsBelowFiveHundred
+    notFirstPurchaseAndCashPayment: () => {
+      if (!(isFirstPurchase === false && paymentType === "cash")) return false;
+      if (purchaseIsAboveThousand) return "20%";
+      return purchaseBetweenFiveHundredAndThousand &&
+        !purchaseIsBelowFiveHundred
         ? "15%"
         : "10%";
     },
-    notFirstPurchaseAndInstallmentsPagament: () => {
-      if (!notFirstPurchaseAndInstallmentsPagament) return false;
-      return purchaseIsAboveThousand
-        ? "10%"
-        : purchaseBetweenFiveHundredAndThousand && !purchaseIsBelowFiveHundred
+    notFirstPurchaseAndInstallmentsPayment: () => {
+      if (!(isFirstPurchase === false && paymentType === "installments"))
+        return false;
+      if (purchaseIsAboveThousand) return "10%";
+      return purchaseBetweenFiveHundredAndThousand &&
+        !purchaseIsBelowFiveHundred
         ? "5%"
         : "Sem desconto";
     },
